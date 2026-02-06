@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Matchmaker Dashboard - Friend Fitter{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6">
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-primary">Matchmaker Dashboard</h1>
+        <p class="py-2 text-base-content/70">Select a pattern and a fabric to find the perfect fit for your friends.</p>
+    </div>
+
+    <form method="GET" class="card bg-base-100 shadow-2xl p-8 border border-base-300">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-bold">Choose a Pattern</span>
+                </label>
+                <select title="Pattern-Select" name="pattern" class="select select-bordered select-primary w-full"
+                    required>
+                    <option disabled selected value="">Pick a pattern...</option>
+                    {% for pattern in patterns %}
+                    <option value="{{ pattern.id }}">
+                        {{ pattern.name }} ({{ pattern.get_category_display }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-bold">Choose a Fabric</span>
+                </label>
+                <select title="Fabric-Select" name="fabric" class="select select-bordered select-secondary w-full"
+                    required>
+                    <option disabled selected value="">Pick a fabric...</option>
+                    {% for fabric in fabrics %}
+                    <option value="{{ fabric.id }}">
+                        {{ fabric.name }} - {{ fabric.width_inches }}" x {{ fabric.length_inches }}"
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+
+        <div class="mt-10">
+            <button type="submit" class="btn btn-primary btn-block text-lg">
+                Find Matches
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

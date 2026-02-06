@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: friendfitter
+  namespace: friendfitter
+  labels:
+    app.kubernetes.io/name: friendfitter
+spec:
+  rules:
+    - host: friendfitter.naterobertstech.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: '/'
+            backend:
+              service:
+                name: friendfitter
+                port:
+                  number: 8000

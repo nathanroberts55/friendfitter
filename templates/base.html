@@ -1,0 +1,59 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>{% block title %}{% endblock title%}</title>
+    <meta name="title" content="Friend Fitter" />
+    <meta name="description" content="{% block primary_description %}{% endblock primary_description %}" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://friendfitter.naterobertstech.com/" />
+    <meta property="og:title" content="Friend Fitter" />
+    <meta property="og:description" content="{% block og_description %}{% endblock og_description %}" />
+    <meta property="og:image" content="{% static 'imgs/android-chrome-192x192.png' %}" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://friendfitter.naterobertstech.com/" />
+    <meta property="twitter:title" content="Friend Fitter" />
+    <meta property="twitter:description" content="{% block tw_description %}{% endblock tw_description %}" />
+    <meta property="twitter:image" content="{% static 'imgs/android-chrome-192x192.png' %}" />
+
+    <!-- Meta Tags Generated with https://metatags.io -->
+    <link rel="icon" type="image/x-icon" href="{% static 'imgs/favicon.ico' %}">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'imgs/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'imgs/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'imgs/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Gasoek+One&display=swap"
+        rel="stylesheet">
+
+    <!-- AlpineJS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {% tailwind_css %}
+</head>
+
+<body class="flex flex-col h-screen">
+    {% include "_navbar.html" %}
+    <main class="container mx-auto flex grow">
+        {% block content %}
+        {% endblock content %}
+    </main>
+    {% include "_footer.html" %}
+</body>
+
+</html>

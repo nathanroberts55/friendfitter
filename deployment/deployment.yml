@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: friendfitter
+  namespace: friendfitter
+spec:
+  selector:
+    matchLabels:
+      app: friendfitter
+  template:
+    metadata:
+      labels:
+        app: friendfitter
+    spec:
+      containers:
+        - name: friendfitter
+          image: docker.io/nater55/friendfitter:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: app-secrets

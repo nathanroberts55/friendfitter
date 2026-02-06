@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Measurements - Friend Fitter{% endblock %}
+{% block primary_description %}Provide your measurements, they are just between you and I, and I will make you something
+cool!{% endblock primary_description %}
+{% block og_description %}Provide your measurements, they are just between you and I, and I will make you something
+cool!{% endblock og_description %}
+{% block tw_description %}Provide your measurements, they are just between you and I, and I will make you something
+cool!{% endblock tw_description %}
+
+{% block content %}
+<div class="container mx-auto p-4 lg:p-10" x-data="{ editing: {% if profile_exists %}false{% else %}true{% endif %} }">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold">My Measurements</h1>
+        {% if last_updated %}
+        <p class="text-sm opacity-60">Last updated: {{ last_updated|date:"M d, Y" }}</p>
+        {% endif %}
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+        <div class="w-full lg:w-1/2 bg-base-200 p-4 rounded-box shadow-inner">
+            <h3 class="text-lg font-semibold mb-4 text-center">Measurement Guide</h3>
+            <img src="{% static 'imgs/clothing-measurement-chart_1.jpg' %}" alt="How to measure"
+                class="mx-auto rounded-lg shadow-md">
+            <p class="mt-4 text-sm italic opacity-70">Please measure snugly against the body for the most accurate gift
+                fitting!</p>
+        </div>
+
+        <div class="w-full lg:w-1/2 card bg-base-100 shadow-xl border border-base-300">
+            <form method="POST" class="card-body">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for field in form %}
+                    <div class="form-control">
+                        <div class="flex items-center gap-2 mb-1">
+                            <label class="label p-0">
+                                <span class="label-text font-semibold">{{ field.label }} (in)</span>
+                            </label>
+
+                            {# Tooltip for Help Text - Mobile Optimized #}
+                            {% if field.help_text %}
+                            <div class="tooltip tooltip-bottom lg:tooltip-right" data-tip="{{ field.help_text }}">
+                                <button title="{{ field.label }} ToolTip" type="button"
+                                    class="btn btn-circle btn-ghost btn-xs text-base-content opacity-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        class="w-4 h-4 stroke-current">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div :class="!editing ? 'opacity-50 pointer-events-none' : ''">
+                            {{ field }}
+                        </div>
+
+                        {% if field.errors %}
+                        <span class="text-error text-xs mt-1">{{ field.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="card-actions justify-end mt-8">
+                    <template x-if="!editing">
+                        <button type="button" @click="editing = true" class="btn btn-secondary w-full md:w-auto">
+                            Update Measurements
+                        </button>
+                    </template>
+
+                    <template x-if="editing">
+                        <button type="submit" class="btn btn-primary w-full md:w-auto">
+                            Save Measurements
+                        </button>
+                    </template>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('form');
+        const fields = form.querySelectorAll('input');
+        // If profile exists, disable all initially
+        {% if profile_exists %}
+        fields.forEach(f => f.readOnly = true);
+        {% endif %}
+    });
+</script>
+{% endblock %}
