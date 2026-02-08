@@ -1,4 +1,42 @@
 from .models import MeasurementProfile, PatternSizeRequirement, Pattern, Fabric
+import re
+from decimal import Decimal, ROUND_HALF_UP
+from django.core.exceptions import ValidationError
+
+
+def validate_and_convert_yardage(value):
+    if not value:
+        return None
+
+    if "." in str(value):
+        raise ValidationError(
+            "Decimals are not allowed. Please use fractions (e.g., 2 3/8)."
+        )
+
+    pattern = r"^(\d+)?\s?(\d+/\d+)?$"
+    match = re.match(pattern, value.strip())
+
+    if not match or value.strip() == "":
+        raise ValidationError("Invalid format. Use '2', '3/8', or '2 3/8'.")
+
+    whole_str, frac_str = match.groups()
+    whole = Decimal(whole_str) if whole_str else Decimal(0)
+    fraction = Decimal(0)
+
+    if frac_str:
+        num, den = map(int, frac_str.split("/"))
+        if num >= den:
+            raise ValidationError(
+                f"Invalid fraction '{frac_str}'. Numerator must be smaller than denominator."
+            )
+        fraction = Decimal(num) / Decimal(den)
+
+    # 1. Calculate total inches
+    total_inches = (whole + fraction) * 36
+
+    # 2. Round to exactly two decimal places
+    # '0.01' tells Decimal to round to the hundredths place
+    return total_inches.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
 def get_sewable_matches(pattern: Pattern, fabric: Fabric):
