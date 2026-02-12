@@ -5,9 +5,8 @@ from .services import validate_and_convert_yardage
 
 
 class PatternSizeRequirementForm(forms.ModelForm):
-    # Override the field to accept string input ('2 3/8') in the UI
     required_length = forms.CharField(
-        help_text="Enter yardage (e.g., '2 3/8'). Will be converted to inches automatically.",
+        help_text="Enter yardage (e.g., '2 3/8' or '2.5').",
         label="Required Length (Yards)",
     )
 
@@ -15,8 +14,18 @@ class PatternSizeRequirementForm(forms.ModelForm):
         model = PatternSizeRequirement
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If we are editing an existing requirement, convert inches to yardage string
+        if self.instance and self.instance.pk:
+            from .services import convert_inches_to_yardage
+
+            # self.instance.required_length is stored in inches (e.g. 85.5)
+            self.initial["required_length"] = convert_inches_to_yardage(
+                self.instance.required_length
+            )
+
     def clean_required_length(self):
-        # Pass the input to our service for validation and conversion
         data = self.cleaned_data["required_length"]
         return validate_and_convert_yardage(data)
 

@@ -2,22 +2,59 @@ from .models import MeasurementProfile, PatternSizeRequirement, Pattern, Fabric
 import re
 from decimal import Decimal, ROUND_HALF_UP
 from django.core.exceptions import ValidationError
+from math import gcd
+
+
+def convert_inches_to_yardage(total_inches):
+    """Converts internal inch measurements back to a yardage string for the UI."""
+    if not total_inches:
+        return ""
+
+    yards = float(total_inches) / 36
+    whole_yards = int(yards)
+    remainder = yards - whole_yards
+
+    # Convert remainder to the nearest 8th of a yard (standard for sewing)
+    eighths = int(round(remainder * 8))
+
+    if eighths == 0:
+        return str(whole_yards)
+    if eighths == 8:
+        return str(whole_yards + 1)
+
+    # Simplify the fraction (e.g., 4/8 becomes 1/2)
+    common = gcd(eighths, 8)
+    num = eighths // common
+    den = 8 // common
+
+    frac_str = f"{num}/{den}"
+    return f"{whole_yards} {frac_str}".strip() if whole_yards > 0 else frac_str
 
 
 def validate_and_convert_yardage(value):
     if not value:
         return None
 
-    if "." in str(value):
-        raise ValidationError(
-            "Decimals are not allowed. Please use fractions (e.g., 2 3/8)."
-        )
+    value_str = str(value).strip()
 
+    # NEW: Check if it's already a decimal (e.g., '2.375' or '85.50' from the DB)
+    # We allow this now so the form doesn't break on re-save
+    try:
+        # If the user entered a decimal, treat it as Yards
+        if "." in value_str:
+            decimal_yards = Decimal(value_str)
+            return (decimal_yards * 36).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+    except:
+        pass
+
+    # Existing fraction logic
     pattern = r"^(\d+)?\s?(\d+/\d+)?$"
-    match = re.match(pattern, value.strip())
+    match = re.match(pattern, value_str)
 
-    if not match or value.strip() == "":
-        raise ValidationError("Invalid format. Use '2', '3/8', or '2 3/8'.")
+    if not match or value_str == "":
+        raise ValidationError("Invalid format. Use '2', '2.5', or '2 3/8'.")
 
     whole_str, frac_str = match.groups()
     whole = Decimal(whole_str) if whole_str else Decimal(0)
@@ -26,16 +63,10 @@ def validate_and_convert_yardage(value):
     if frac_str:
         num, den = map(int, frac_str.split("/"))
         if num >= den:
-            raise ValidationError(
-                f"Invalid fraction '{frac_str}'. Numerator must be smaller than denominator."
-            )
+            raise ValidationError(f"Invalid fraction '{frac_str}'.")
         fraction = Decimal(num) / Decimal(den)
 
-    # 1. Calculate total inches
     total_inches = (whole + fraction) * 36
-
-    # 2. Round to exactly two decimal places
-    # '0.01' tells Decimal to round to the hundredths place
     return total_inches.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
