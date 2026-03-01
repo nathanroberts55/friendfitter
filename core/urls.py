@@ -11,4 +11,5 @@ urlpatterns = [
         name="matchmaker_results",
     ),
     path("my-measurements/", views.measurement_update, name="measurement_update"),
+    path("measurements/", views.admin_measurement_list, name="admin_measurement_list"),
 ]

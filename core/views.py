@@ -79,3 +79,14 @@ def matchmaker_results(request, pattern_id: int, fabric_id: int):
         "matches": matches,
     }
     return render(request, "core/matchmaker_results.html", context)
+
+
+@staff_member_required
+def admin_measurement_list(request):
+    # Fetch all profiles and select_related 'user' to avoid N+1 queries
+    profiles = (
+        MeasurementProfile.objects.select_related("user")
+        .all()
+        .order_by("user__username")
+    )
+    return render(request, "core/admin_measurements.html", {"profiles": profiles})

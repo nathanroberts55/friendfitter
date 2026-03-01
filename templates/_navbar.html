@@ -11,20 +11,33 @@
             <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
                 {% if user.is_authenticated %}
                 {% if user.is_staff %}
-                <li><a href="{% url 'matchmaker_dashboard' %}"
-                        class="{% if 'matchmaker' in request.resolver_match.url_name %}active{% endif %}">Matchmaker
-                        Dashboard</a></li>
+                <li>
+                    <a href="{% url 'matchmaker_dashboard' %}"
+                        class="{% if request.resolver_match.url_name == 'matchmaker_dashboard' %}active{% endif %}">
+                        Matchmaker Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'admin_measurement_list' %}"
+                        class="{% if request.resolver_match.url_name == 'admin_measurement_list' %}active{% endif %}">
+                        User Registry
+                    </a>
+                </li>
                 {% endif %}
-                <li><a href="{% url 'measurement_update' %}"
-                        class="{% if request.resolver_match.url_name == 'measurement_update' %}active{% endif %}">My
-                        Measurements</a></li>
+
+                <li>
+                    <a href="{% url 'measurement_update' %}"
+                        class="{% if request.resolver_match.url_name == 'measurement_update' %}active{% endif %}">
+                        My Measurements
+                    </a>
+                </li>
                 {% else %}
                 <li><a href="{% url 'index' %}">Home</a></li>
                 {% endif %}
             </ul>
         </div>
-        <a href="{% url 'index' %}" class="btn btn-ghost text-xl p-0">
-            <img class="h-10 md:h-12" src="{% static 'imgs/friendfitter_logo_white_transparent.png' %}"
+        <a href="{% url 'index' %}" class="flex items-center gap-2">
+            <img src="{% static 'imgs/friendfitter_logo_white_transparent.png' %}" class="h-8 w-auto"
                 alt="Friend Fitter Logo">
         </a>
     </div>
@@ -35,8 +48,14 @@
             {% if user.is_staff %}
             <li>
                 <a href="{% url 'matchmaker_dashboard' %}"
-                    class="{% if 'matchmaker' in request.resolver_match.url_name %}active bg-primary text-primary-content{% endif %} font-bold">
+                    class="{% if request.resolver_match.url_name == 'matchmaker_dashboard' %}active bg-primary text-primary-content{% endif %} font-bold">
                     Matchmaker Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin_measurement_list' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_measurement_list' %}active bg-primary text-primary-content{% endif %} font-bold">
+                    User Registry
                 </a>
             </li>
             {% endif %}

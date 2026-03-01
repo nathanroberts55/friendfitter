@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-6" x-data="{ search: '' }">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-primary">User Measurement Registry</h1>
+            <p class="text-base-content/60">Viewing all recorded body measurements</p>
+        </div>
+
+        <div class="form-control w-full max-w-xs">
+            <input type="text" x-model="search" placeholder="Search by name..."
+                class="input input-bordered focus:input-primary w-full" />
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for profile in profiles %}
+        <div class="card bg-base-100 shadow-xl border border-base-200"
+            x-show="'{{ profile.user.username|escapejs }}'.toLowerCase().includes(search.toLowerCase())">
+
+            <div class="card-body">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <div class="avatar placeholder shrink-0">
+                            <div
+                                class="bg-neutral text-neutral-content rounded-full w-10 h-10 flex items-center justify-center">
+                                <span class="text-lg">{{ profile.user.username|slice:":1"|upper }}</span>
+                            </div>
+                        </div>
+
+                        <h2 class="card-title text-secondary truncate" title="{{ profile.user.username }}">
+                            {{ profile.user.username }}
+                        </h2>
+                    </div>
+
+                    {% if profile.bust_chest and profile.waist and profile.hips %}
+                    <div class="badge badge-success badge-outline shrink-0 uppercase text-[10px] font-bold">Complete
+                    </div>
+                    {% else %}
+                    <div class="badge badge-warning badge-outline shrink-0 uppercase text-[10px] font-bold">Incomplete
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="divider my-1"></div>
+
+                <table class="table table-compact w-full">
+                    <tbody>
+                        <tr>
+                            <td class="font-bold opacity-60">Bust/Chest</td>
+                            <td class="text-right">{{ profile.bust_chest|default:"--" }} <small>in</small></td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold opacity-60">Waist</td>
+                            <td class="text-right">{{ profile.waist|default:"--" }} <small>in</small></td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold opacity-60">Hips</td>
+                            <td class="text-right">{{ profile.hips|default:"--" }} <small>in</small></td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold opacity-60">Shoulder</td>
+                            <td class="text-right">{{ profile.shoulder_width|default:"--" }} <small>in</small></td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold opacity-60">Inseam</td>
+                            <td class="text-right">{{ profile.inseam|default:"--" }} <small>in</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card-actions justify-end mt-4">
+                    <div class="text-xs italic opacity-40">Updated: {{ profile.last_updated|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center py-20"
+        x-show="search !== '' && $el.parentElement.querySelectorAll('.card[style*=\'display: none\']').length === {{ profiles|length }}">
+        <p class="text-xl opacity-50">No users found matching "<span x-text="search"></span>"</p>
+    </div>
+</div>
+{% endblock %}
